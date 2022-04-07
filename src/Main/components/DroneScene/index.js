@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   ViroARScene,
   ViroNode,
-  ViroAmbientLight,
   Viro3DObject,
   ViroARPlaneSelector,
   ViroSpotLight,
@@ -10,7 +9,7 @@ import {
 } from '@viro-community/react-viro';
 
 const resources = [
-  require('../../res/drone/black.jpg'),
+  require('../../res/drone/black.jpeg'),
   require('../../res/drone/gold.jpeg'),
   require('../../res/drone/silver.jpeg'),
   require('../../res/drone/cobre.jpeg'),
@@ -21,9 +20,11 @@ export default function DroneScene({ arSceneNavigator }) {
 
   const {
     reset,
+    withShadow,
     clearReset,
     startLoad,
     endLoad,
+    runAnimation,
     leftJoystickDirection,
     rigthJoystickDirection,
   } = arSceneNavigator.viroAppProps;
@@ -47,7 +48,8 @@ export default function DroneScene({ arSceneNavigator }) {
   }
 
   useEffect(() => {
-    if (reset) {
+    if (reset && drone.current) {
+      console.log('entrou');
       rotateY.current = 0;
       translateY.current = 0;
       translateZ.current = 0;
@@ -60,14 +62,22 @@ export default function DroneScene({ arSceneNavigator }) {
 
       setTimeout(() => clearReset(), 600);
     }
-  }, [reset, clearReset]);
+  }, [drone, reset, clearReset]);
 
   useEffect(() => {
     if (drone.current) {
       if (leftJoystickDirection === 'up') {
         clearInterval(intervaRigthMoveId.current);
         intervaRigthMoveId.current = setInterval(() => {
-          translateZ.current += 0.01;
+          if (rotateY.current === 0) {
+            translateZ.current += 0.01;
+          } else if (rotateY.current > 0) {
+            translateZ.current += 0.01;
+            translateX.current += 0.01;
+          } else if (rotateY.current < 0) {
+            translateZ.current += 0.01;
+            translateX.current -= 0.01;
+          }
 
           if (rotateX.current < 9) {
             rotateX.current += 1.5;
@@ -81,11 +91,19 @@ export default function DroneScene({ arSceneNavigator }) {
             ],
             rotation: [rotateX.current, rotateY.current, rotateZ.current],
           });
-        }, 20);
+        }, 15);
       } else if (leftJoystickDirection === 'down') {
         clearInterval(intervaRigthMoveId.current);
         intervaRigthMoveId.current = setInterval(() => {
-          translateZ.current -= 0.01;
+          if (rotateY.current === 0) {
+            translateZ.current -= 0.01;
+          } else if (rotateY.current > 0) {
+            translateZ.current -= 0.01;
+            translateX.current -= 0.01;
+          } else if (rotateY.current < 0) {
+            translateZ.current -= 0.01;
+            translateX.current += 0.01;
+          }
 
           if (rotateX.current > -9) {
             rotateX.current -= 1.5;
@@ -99,7 +117,7 @@ export default function DroneScene({ arSceneNavigator }) {
             ],
             rotation: [rotateX.current, rotateY.current, rotateZ.current],
           });
-        }, 20);
+        }, 15);
       } else if (leftJoystickDirection === 'right') {
         clearInterval(intervaRigthMoveId.current);
         intervaRigthMoveId.current = setInterval(() => {
@@ -117,7 +135,7 @@ export default function DroneScene({ arSceneNavigator }) {
             ],
             rotation: [rotateX.current, rotateY.current, rotateZ.current],
           });
-        }, 20);
+        }, 15);
       } else if (leftJoystickDirection === 'left') {
         clearInterval(intervaRigthMoveId.current);
         intervaRigthMoveId.current = setInterval(() => {
@@ -135,18 +153,23 @@ export default function DroneScene({ arSceneNavigator }) {
             ],
             rotation: [rotateX.current, rotateY.current, rotateZ.current],
           });
-        }, 20);
+        }, 15);
       } else {
         clearInterval(intervaRigthMoveId.current);
         intervaRigthRotateId.current = setInterval(() => {
-          if (rotateX.current > 0) {
-            rotateX.current -= 1;
-          } else if (rotateX.current < 0) {
-            rotateX.current += 1;
-          } else if (rotateZ.current > 0) {
-            rotateZ.current -= 1;
-          } else if (rotateZ.current < 0) {
-            rotateZ.current += 1;
+          if (rotateX.current !== 0 || rotateZ.current !== 0) {
+            if (rotateX.current > 0) {
+              rotateX.current -= 1;
+            }
+            if (rotateX.current < 0) {
+              rotateX.current += 1;
+            }
+            if (rotateZ.current > 0) {
+              rotateZ.current -= 1;
+            }
+            if (rotateZ.current < 0) {
+              rotateZ.current += 1;
+            }
           } else {
             clearInterval(intervaRigthRotateId.current);
           }
@@ -154,7 +177,7 @@ export default function DroneScene({ arSceneNavigator }) {
           drone.current.setNativeProps({
             rotation: [rotateX.current, rotateY.current, rotateZ.current],
           });
-        }, 20);
+        }, 15);
       }
     }
   }, [drone, leftJoystickDirection]);
@@ -215,7 +238,6 @@ export default function DroneScene({ arSceneNavigator }) {
   return useMemo(
     () => (
       <ViroARScene>
-        <ViroAmbientLight color="#FFFFFF" />
         <ViroARPlaneSelector
           minHeight={0.1}
           minWidth={0.1}
@@ -223,23 +245,23 @@ export default function DroneScene({ arSceneNavigator }) {
           pauseUpdates={pauseUpdates}
           maxPlanes={1}
           onPlaneSelected={onPlaneSelected}>
-          {/* <ViroSpotLight
-          attenuationStartDistance={5}
-          attenuationEndDistance={10}
-          color="#ffffff"
-          direction={[0, -0.5, -0.2]}
-          position={[0, 3, 1]}
-          innerAngle={5}
-          outerAngle={20}
-          castsShadow
-          shadowNearZ={2}
-          shadowFarZ={5}
-          shadowOpacity={0.7}
-        /> */}
           <ViroNode ref={drone}>
+            <ViroSpotLight
+              attenuationStartDistance={5}
+              attenuationEndDistance={10}
+              color="#ffffff"
+              direction={[0, -0.5, -0.2]}
+              position={[0, 3, 1]}
+              innerAngle={5}
+              outerAngle={20}
+              castsShadow={withShadow}
+              shadowNearZ={2}
+              shadowFarZ={3.5}
+              shadowOpacity={0.6}
+            />
             <Viro3DObject
               position={[0, 0, 0]}
-              scale={[0.01, 0.01, 0.011]}
+              scale={[0.01, 0.01, 0.01]}
               source={require('../../res/drone/drone.vrx')}
               resources={resources}
               type="VRX"
@@ -247,21 +269,21 @@ export default function DroneScene({ arSceneNavigator }) {
               onLoadEnd={endLoad}
               animation={{
                 name: 'Simple_drone',
-                run: true,
+                run: runAnimation,
                 loop: true,
               }}
             />
           </ViroNode>
-          {/* <ViroQuad
-          position={[0, 0, 0]}
-          rotation={[-90, 0, 0]}
-          width={0.6}
-          height={0.6}
-          arShadowReceiver={true}
-        /> */}
+          <ViroQuad
+            position={[0, 0, 0]}
+            rotation={[-90, 0, 0]}
+            width={2}
+            height={2}
+            arShadowReceiver
+          />
         </ViroARPlaneSelector>
       </ViroARScene>
     ),
-    [endLoad, pauseUpdates, startLoad],
+    [pauseUpdates, withShadow, startLoad, endLoad, runAnimation],
   );
 }
