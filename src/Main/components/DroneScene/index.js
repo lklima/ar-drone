@@ -6,6 +6,7 @@ import {
   ViroARPlaneSelector,
   ViroSpotLight,
   ViroQuad,
+  ViroAmbientLight,
 } from '@viro-community/react-viro';
 
 const resources = [
@@ -245,20 +246,23 @@ export default function DroneScene({ arSceneNavigator }) {
           pauseUpdates={pauseUpdates}
           maxPlanes={1}
           onPlaneSelected={onPlaneSelected}>
+          {!withShadow && <ViroAmbientLight color="#ffffff" />}
           <ViroNode ref={drone}>
-            <ViroSpotLight
-              attenuationStartDistance={5}
-              attenuationEndDistance={10}
-              color="#ffffff"
-              direction={[0, -0.5, -0.2]}
-              position={[0, 3, 1]}
-              innerAngle={5}
-              outerAngle={20}
-              castsShadow={withShadow}
-              shadowNearZ={2}
-              shadowFarZ={3.5}
-              shadowOpacity={0.6}
-            />
+            {withShadow && (
+              <ViroSpotLight
+                attenuationStartDistance={5}
+                attenuationEndDistance={10}
+                color="#ffffff"
+                direction={[0, -0.5, -0.2]}
+                position={[0, 3, 1]}
+                innerAngle={5}
+                outerAngle={20}
+                castsShadow={withShadow}
+                shadowNearZ={2}
+                shadowFarZ={3.5}
+                shadowOpacity={0.6}
+              />
+            )}
             <Viro3DObject
               position={[0, 0, 0]}
               scale={[0.01, 0.01, 0.01]}
@@ -274,13 +278,15 @@ export default function DroneScene({ arSceneNavigator }) {
               }}
             />
           </ViroNode>
-          <ViroQuad
-            position={[0, 0, 0]}
-            rotation={[-90, 0, 0]}
-            width={2}
-            height={2}
-            arShadowReceiver
-          />
+          {withShadow && (
+            <ViroQuad
+              position={[0, 0, 0]}
+              rotation={[-90, 0, 0]}
+              width={2}
+              height={2}
+              arShadowReceiver
+            />
+          )}
         </ViroARPlaneSelector>
       </ViroARScene>
     ),
