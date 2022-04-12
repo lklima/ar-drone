@@ -1,29 +1,23 @@
-# Viro Starter Kit
+# AR Drone React Native
 
-This is a blank React Native project setup with Viro.
+A fun personal project for drones lovers 🥰.</br>
+This is a React Native project setup with Viro and Reaniamted.
 
-## Prerequesites 
+https://github.com/viromedia/viro </br>
+https://github.com/software-mansion/react-native-reanimated
 
-Set up the development environment for [react native](https://reactnative.dev/docs/environment-setup). 
+NOTE: There are some bugs in the drone moviment, feel free to try to fix.
 
-> ⚠️ NOTE: The android emulators are not supported by Viro. See [this](https://viro-community.readme.io/docs/frequently-asked-questions#does-this-work-with-ios-simulators-or-android-emulators).
+Give me a ⭐️ if you liked this project.
 
 ## Installation
 
-1. `git clone https://github.com/ViroCommunity/starter-kit.git`
-2. `cd starter-kit`
-3. `npm install`
+1. `git clone https://github.com/lklima/ar-drone.git`
+2. `cd ar-drone`
+3. `yarn install`
 4. `npx pod-install` (iOS)
 5. `npx react-native run-android` or `npx react-native run-ios`
 
 if `npx react-native run-android` fails with EACCESS gradlew.bat or EACCESS gradlew, run `chmod +x gradlew.bat` or `chmod +x gradlew`.
 
-NOTE: The variant arguments are not needed for debug or release.
-
-## How to Install Viro in an existing project?
-
-If you are integrating ViroReact into an existing project, have a look at our [Installation instructions](https://github.com/ViroCommunity/viro/blob/main/readmes/INSTALL.md). Please note that this does _not_ work with Expo Managed Workflows. Sorry!
-
-# Need help?
-
-[Reach us in Discord.](https://discord.gg/YfxDBGTxvG)
+![FotoJet](./demo.gif)
